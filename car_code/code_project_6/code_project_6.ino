@@ -1,20 +1,4 @@
-// ================================================
-// Project: arduino_prj -  system that smooths the shock effect in a car battery. 
-// Date: October 8, 2024
-// Author: Daniel faruz
-//         Natan  sabag
-// ================================================
 
-/*
-README:
-
-Project Overview:
------------------
-project, which focuses on creating a system that smooths the shock effect in a car battery. 
-The system utilizes a supercapacitor, a high-current Hall effect sensor, relays, and a D-latch to regulate and manage the power distribution effectively, 
-ensuring a more stable electrical flow during vehicle starts.
-
-*/
 
 
 #define CURRENT_METER_BAT_SENSOR A4
