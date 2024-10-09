@@ -1,0 +1,21 @@
+###########################################
+# Syntax Coloring Map For Robojax_WCS
+###########################################
+
+###########################################
+# Datatypes (KEYWORD1)
+###########################################
+
+Robojax_WCS	KEYWORD1
+
+###########################################
+# Methods and Functions (KEYWORD2)
+###########################################
+current	KEYWORD2
+getCurrent	KEYWORD2
+getCurrentAverage	KEYWORD2
+begin	KEYWORD2
+
+###########################################
+# Constants (LITERAL1)
+###########################################
