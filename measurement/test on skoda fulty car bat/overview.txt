@@ -1,0 +1,3 @@
+car with bad battery with droping to 6v on starter pulse 
+working voltage 12.75
+alternator voltage 13.9v

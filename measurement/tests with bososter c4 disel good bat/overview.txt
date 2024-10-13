@@ -1,0 +1,3 @@
+In the test conducted using a CR 2013 battery that initially showed good performance, we observed a significant voltage drop to 9V during the load.
+ This is concerning as it indicates that despite the battery's good condition, it struggles under load. For comparison, we used a booster charger equipped with LiPo batteries that provide a steady 12V output. However,
+ as the test results show, the outcome is not promising. The LiPo battery did not significantly improve the voltage stability under the same conditions, raising questions about its effectiveness for this specific use case.
