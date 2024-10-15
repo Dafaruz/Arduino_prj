@@ -20,9 +20,11 @@ ensuring a more stable electrical flow during vehicle starts.
 
 #define CURRENT_METER_BAT_SENSOR A4
 #define CURRENT_METER_CAP_SENSOR A5
-#define VOLTAGE_METER_BAT_SENSOR A3
-#define BAT_SWITCH 5
-#define CAP_SWITCH 6
+#define VOLTAGE_METER_BAT_SENSOR A2
+#define BAT_SWITCH_ON 2
+#define BAT_SWITCH_OFF 3 
+#define CAP_SWITCH_ON 4
+#define CAP_SWITCH_OFF 5
 
 
 const float vRef = 5.07;  // référence Tension of Arduino (5V in general)
@@ -80,8 +82,8 @@ void setup()
   set_zero_current_value_cap = setZeroCurent_cap();
   set_zero_current_value_bat = setZeroCurent_bat();
   pinMode(VOLTAGE_METER_BAT_SENSOR, INPUT);
-  pinMode(CAP_SWITCH, OUTPUT);
-  pinMode(BAT_SWITCH, OUTPUT);
+  pinMode(CAP_SWITCH_ON, OUTPUT);
+  pinMode(BAT_SWITCH_OFF, OUTPUT);
 
   Serial.print("enter veck check\n");        
   for (int i=0;i<100;i++)
@@ -94,6 +96,11 @@ void setup()
   Serial.print("out veck check\n");
   Serial.println(max_vec(vec_current_bat));
   Serial.println(max_vec(vec_current_cap));
+
+   digitalWrite(BAT_SWITCH_ON, 0);
+   digitalWrite(BAT_SWITCH_OFF,0);
+   digitalWrite(CAP_SWITCH_ON, 0);
+   digitalWrite(CAP_SWITCH_OFF,0);
 
   
 }
@@ -121,13 +128,30 @@ void loop() {
     Serial.print("\n");
     delay(1000);
 
+    digitalWrite(BAT_SWITCH_ON, 1);    
+    delay(200);                              //bat on
+    digitalWrite(BAT_SWITCH_ON, 0); 
+    delay(200);
 
+    digitalWrite(CAP_SWITCH_ON, 1);    
+    delay(200);                              //cap on 
+    digitalWrite(CAP_SWITCH_ON, 0);
+
+    /*digitalWrite(BAT_SWITCH_OFF, 1);    
+    delay(200);                              //bat off
+    digitalWrite(BAT_SWITCH_OFF, 0);  
+    delay(1500);
+    digitalWrite(CAP_SWITCH_OFF, 1);    
+    delay(10);                              //cap off
+    digitalWrite(CAP_SWITCH_OFF, 0); 
+    delay(1500);
+*/
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////                                        the 1st statemant                                 ////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
     if (voltage_bat <= 13.0 && current_meter_bat < 3.0  && off_to_on) {  // Car is off, check the minimum current off to on init to high and will reset to higfh every igniotion
         Serial.println("Car is off");  // indicator 
         digitalWrite(BAT_SWITCH, HIGH);    //!!!!!
@@ -205,6 +229,7 @@ void loop() {
         off_to_on = HIGH;   // re init the 1st statment 
    
     }
+    */
 }
 
 
@@ -323,8 +348,8 @@ float getcurrent_bat()
     Serial.println();
   
     float averageCurrent = totalCurrent / (MEASUREMENT_ITERATION);
-    Serial.print("average Vout ");
-    Serial.println((averageCurrent * sensitivity_bat) + offset_bat);
+    /*Serial.print("average Vout ");
+    Serial.println((averageCurrent * sensitivity_bat) + offset_bat);*/
     if(set_zero_current_value_bat)
     {
         averageCurrent -= ZeroCurrentvalue_bat;
@@ -354,13 +379,13 @@ float getcurrent_cap()
         totalCurrent += current1;
         delay(1);
 
-        Serial.print(voltage);
-        Serial.print(" ");
+       /* Serial.print(voltage);
+        Serial.print(" ");*/
     
     }
     float averageCurrent = totalCurrent / MEASUREMENT_ITERATION;
-    Serial.print("average Vout ");
-    Serial.println((averageCurrent * sensitivity_cap) + offset_cap);
+    /*Serial.print("average Vout ");
+    Serial.println((averageCurrent * sensitivity_cap) + offset_cap);*/
     if(set_zero_current_value_cap)
     {
         averageCurrent -= ZeroCurrentvalue_cap;
