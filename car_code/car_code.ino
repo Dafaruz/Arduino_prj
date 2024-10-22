@@ -83,15 +83,15 @@ void setup()
   set_zero_current_value_bat = setZeroCurent_bat();
   pinMode(VOLTAGE_METER_BAT_SENSOR, INPUT);
   pinMode(CAP_SWITCH_ON, OUTPUT);
+  pinMode(CAP_SWITCH_OFF, OUTPUT);
+  pinMode(BAT_SWITCH_ON, OUTPUT);
   pinMode(BAT_SWITCH_OFF, OUTPUT);
 
-  Serial.print("enter veck check\n");        
-  for (int i=0;i<100;i++)
-  {
-    vec_current_bat[i] = getcurrent_bat();
-    vec_current_cap[i] = getcurrent_cap();
 
-  }
+  
+    vec_current_bat[0] = 10;
+    vec_current_cap[0] = 10;
+  
   
   Serial.print("out veck check\n");
   Serial.println(max_vec(vec_current_bat));
@@ -101,8 +101,10 @@ void setup()
    digitalWrite(BAT_SWITCH_OFF,0);
    digitalWrite(CAP_SWITCH_ON, 0);
    digitalWrite(CAP_SWITCH_OFF,0);
+  delay(1000);
 
-  
+
+
 }
 
 
@@ -113,6 +115,8 @@ void setup()
 void loop() {
 
     
+ 
+    delay(5000);
     current_meter_bat=getcurrent_bat();
     Serial.print("current baterie ");
     Serial.println(current_meter_bat);
@@ -128,45 +132,39 @@ void loop() {
     Serial.print("\n");
     delay(1000);
 
-    digitalWrite(BAT_SWITCH_ON, 1);    
-    delay(200);                              //bat on
-    digitalWrite(BAT_SWITCH_ON, 0); 
-
-
-    digitalWrite(CAP_SWITCH_ON, 1);    
-    delay(200);                              //cap on 
-    digitalWrite(CAP_SWITCH_ON, 0);
-
-    digitalWrite(BAT_SWITCH_OFF, 1);    
-    delay(200);                              //bat off
-    digitalWrite(BAT_SWITCH_OFF, 0);  
-
-    digitalWrite(CAP_SWITCH_OFF, 1);    
-    delay(10);                              //cap off
-    digitalWrite(CAP_SWITCH_OFF, 0); 
-
-
-
-
+ 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////                                        the 1st statemant                                 ////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     if (voltage_bat <= 13.0 && current_meter_bat < 3.0  && off_to_on) {  // Car is off, check the minimum current off to on init to high and will reset to higfh every igniotion
         Serial.println("Car is off");  // indicator 
-         digitalWrite(BAT_SWITCH_ON, 1);    
-         delay(200);                              //bat on
-         digitalWrite(BAT_SWITCH_ON, 0); 
+        digitalWrite(BAT_SWITCH_ON, 1);    
+        delay(20);                              //bat on
+        digitalWrite(BAT_SWITCH_ON, 0);
+        delay(20);
 
-        while(getcurrent_bat() <= 1)                 // equalibrium current between the cap and bat
+        Serial.println("discharge or charge the cap the currentr is :");
+        Serial.println(getcurrent_cap());
+
+        digitalWrite(CAP_SWITCH_ON, 1);    
+        delay(20);                              //cap on 
+        digitalWrite(CAP_SWITCH_ON, 0);                       // Close the switch to compare voltage      
+         delay(10000); 
+         digitalWrite(CAP_SWITCH_OFF, 1);    
+         delay(10);                              //cap off
+         digitalWrite(CAP_SWITCH_OFF, 0);
+
+        /*while(getcurrent_bat() <= 1)                 // equalibrium current between the cap and bat
             {
-                Serial.println("discharge or charge the cap");
-                Serial.print(getcurrent_cap());
-                Serial.print(" ");                                                          
+                Serial.println("discharge or charge the cap the currentr is :");
+                Serial.println(getcurrent_cap());
+                Serial.println("force enable cap");                                                      
                 digitalWrite(CAP_SWITCH_ON, 1);    
                 delay(200);                              //cap on 
                 digitalWrite(CAP_SWITCH_ON, 0);                       // Close the switch to compare voltage      
-
+                delay(10000);
+                Serial.println("force enable cap end");   
                 if(getcurrent_cap() <= max_vec(vec_current_cap))        // the voltage of the bat and cap is the same 
                 {
                   Serial.println("enter to the break");
@@ -175,39 +173,43 @@ void loop() {
                   digitalWrite(CAP_SWITCH_OFF, 0);                    
                   break;
                 }
-            }
+            }*/
             
             
-           // vactor check to find the max current when car is off (the leakage current)
+           // vector check to find the max current when car is off (the leakage current)
           Serial.print("enter veck check\n");        
-          for (int i=0;i<100;i++)
+          for (int i=0;i<10;i++)
           {
               vec_current_bat[i] = getcurrent_bat();
               vec_current_cap[i] = getcurrent_cap();
 
           }
-          Serial.print(current_meter_bat);
-          Serial.print("out veck check\n");
+          Serial.println("out veck check\n");
+          Serial.print("the max bat current is :");
           Serial.println(max_vec(vec_current_bat));
+          Serial.print("the max cap current is: ");
           Serial.println(max_vec(vec_current_cap));
+
           counter++;   
           cap_full = LOW; 
           off_to_on = LOW;                                               // Bool indicates the status of the capacitor
      
     }
+    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////                                        the 2nd statemant                                 ////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    if (voltage_bat <= 13.0 && current_meter_bat > max_vec(vec_current_bat)*3) {   // Car switch is open, "someone will start the car soon"
-
+    if (voltage_bat <= 13.0 && current_meter_bat > 3.00) {   // Car switch is open, "someone will start the car soon" the sensor is not stabel the full statment is (voltage_bat <= 13.0 && current_meter_bat > max_vec(vec_current_bat)*50)
+          Serial.println("car switch is open");
           cap_full = LOW;
           digitalWrite(CAP_SWITCH_ON, 1);    
           delay(200);                              //cap on 
           digitalWrite(CAP_SWITCH_ON, 0); 
 
-        if(counter == 10)
+     
+        if(counter == 2)
         {
           Serial.println("the counter is 10 only cap will ignite the car");
           digitalWrite(BAT_SWITCH_OFF, 1);    
@@ -224,7 +226,8 @@ void loop() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (voltage_bat >= 13.5 && cap_full == LOW) {
 
-        Serial.println("the engain is on and alternator is pumping current ");
+        Serial.println("the engine is on and alternator is pumping current ");
+        
         digitalWrite(BAT_SWITCH_ON, 1);    
         delay(200);                              //bat on
         digitalWrite(BAT_SWITCH_ON, 0); 
@@ -235,7 +238,8 @@ void loop() {
         digitalWrite(CAP_SWITCH_ON, 0);
 
     
-        if (current_meter_cap <max_vec(vec_current_cap)) {
+
+        if (current_meter_cap <1.00) {  // the full statement is (current_meter_cap <max_vec(vec_current_cap)*3) doue to bad sensor we cahnge to 1.00 amp
             digitalWrite(CAP_SWITCH_OFF, 1);    
             delay(10);                              //cap off
             digitalWrite(CAP_SWITCH_OFF, 0); 
@@ -359,14 +363,11 @@ float getcurrent_bat()
         float current1 = (voltage - offset_bat) / sensitivity_bat;
         totalCurrent += current1;
         delay(1);
-         /* Serial.print(voltage);
-        Serial.print(" ");*/
+
     }
     Serial.println();
   
     float averageCurrent = totalCurrent / (MEASUREMENT_ITERATION);
-    /*Serial.print("average Vout ");
-    Serial.println((averageCurrent * sensitivity_bat) + offset_bat);*/
     if(set_zero_current_value_bat)
     {
         averageCurrent -= ZeroCurrentvalue_bat;
@@ -395,14 +396,9 @@ float getcurrent_cap()
         float current1 = (voltage - offset_cap) / sensitivity_cap;
         totalCurrent += current1;
         delay(1);
-
-       /* Serial.print(voltage);
-        Serial.print(" ");*/
     
     }
     float averageCurrent = totalCurrent / MEASUREMENT_ITERATION;
-    /*Serial.print("average Vout ");
-    Serial.println((averageCurrent * sensitivity_cap) + offset_cap);*/
     if(set_zero_current_value_cap)
     {
         averageCurrent -= ZeroCurrentvalue_cap;
@@ -411,7 +407,9 @@ float getcurrent_cap()
 }
 
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////                                  pull voltage value from bat                                         ///////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 float getvoltage_bat(){
